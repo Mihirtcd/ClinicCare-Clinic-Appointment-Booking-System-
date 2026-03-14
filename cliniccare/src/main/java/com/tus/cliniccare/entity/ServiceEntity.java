@@ -40,6 +40,10 @@ public class ServiceEntity {
     @Column(name = "duration_minutes", nullable = false)
     private Integer durationMinutes;
 
+    @NotNull
+    @Column(name = "is_enabled", nullable = false)
+    private Boolean isEnabled = true;
+
     @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DoctorService> doctorServices = new ArrayList<>();
 
@@ -79,6 +83,14 @@ public class ServiceEntity {
 
     public void setDurationMinutes(Integer durationMinutes) {
         this.durationMinutes = durationMinutes;
+    }
+
+    public Boolean getIsEnabled() {
+        return isEnabled;
+    }
+
+    public void setIsEnabled(Boolean isEnabled) {
+        this.isEnabled = isEnabled;
     }
 
     public List<DoctorService> getDoctorServices() {

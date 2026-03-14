@@ -8,8 +8,4 @@ import java.util.List;
 public interface DoctorServiceRepository extends JpaRepository<DoctorService, Long> {
 
     List<DoctorService> findByDoctorId(Long doctorId);
-
-    List<DoctorService> findByServiceId(Long serviceId);
-
-    boolean existsByDoctorIdAndServiceId(Long doctorId, Long serviceId);
 }
