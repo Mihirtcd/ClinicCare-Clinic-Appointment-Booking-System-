@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
+    boolean existsByTimeSlotId(Long timeSlotId);
+
     List<Appointment> findByPatientId(Long patientId);
 
     List<Appointment> findByDoctorId(Long doctorId);
