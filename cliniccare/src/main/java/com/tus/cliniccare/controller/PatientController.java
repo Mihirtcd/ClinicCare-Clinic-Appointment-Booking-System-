@@ -14,8 +14,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,8 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping({"/patient", "/api/patient"})
-@PreAuthorize("hasAnyRole('PATIENT','ADMIN')")
+@RequestMapping("/api/patient")
+@PreAuthorize("hasRole('PATIENT')")
 public class PatientController {
 
     private final ServiceEntityService serviceEntityService;
@@ -61,9 +61,9 @@ public class PatientController {
         return ResponseEntity.ok(responses);
     }
 
-    @GetMapping("/appointments/{patientId}")
-    public ResponseEntity<List<AppointmentResponse>> getAppointmentsByPatient(@PathVariable Long patientId) {
-        List<AppointmentResponse> responses = appointmentService.getAppointmentsByPatient(patientId)
+    @GetMapping("/appointments")
+    public ResponseEntity<List<AppointmentResponse>> getAppointmentsByPatient(Authentication authentication) {
+        List<AppointmentResponse> responses = appointmentService.getAppointmentsByPatient(authentication.getName())
                 .stream()
                 .map(this::toAppointmentResponse)
                 .toList();
@@ -71,9 +71,12 @@ public class PatientController {
     }
 
     @PostMapping("/appointments")
-    public ResponseEntity<AppointmentResponse> bookAppointment(@Valid @RequestBody BookAppointmentRequest request) {
+    public ResponseEntity<AppointmentResponse> bookAppointment(
+            @Valid @RequestBody BookAppointmentRequest request,
+            Authentication authentication
+    ) {
         Appointment appointment = appointmentService.bookAppointment(
-                request.getPatientId(),
+                authentication.getName(),
                 request.getDoctorId(),
                 request.getServiceId(),
                 request.getTimeSlotId(),

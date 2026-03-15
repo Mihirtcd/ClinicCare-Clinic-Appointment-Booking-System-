@@ -6,9 +6,6 @@ import jakarta.validation.constraints.Size;
 public class BookAppointmentRequest {
 
     @NotNull
-    private Long patientId;
-
-    @NotNull
     private Long doctorId;
 
     @NotNull
@@ -21,14 +18,6 @@ public class BookAppointmentRequest {
     private String patientNote;
 
     public BookAppointmentRequest() {
-    }
-
-    public Long getPatientId() {
-        return patientId;
-    }
-
-    public void setPatientId(Long patientId) {
-        this.patientId = patientId;
     }
 
     public Long getDoctorId() {

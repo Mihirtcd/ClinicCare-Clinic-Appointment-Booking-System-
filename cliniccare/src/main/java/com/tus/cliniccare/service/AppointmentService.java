@@ -6,7 +6,11 @@ import com.tus.cliniccare.entity.ServiceEntity;
 import com.tus.cliniccare.entity.TimeSlot;
 import com.tus.cliniccare.entity.User;
 import com.tus.cliniccare.entity.enums.AppointmentStatus;
+import com.tus.cliniccare.entity.enums.Role;
 import com.tus.cliniccare.entity.enums.TimeSlotStatus;
+import com.tus.cliniccare.exception.BadRequestException;
+import com.tus.cliniccare.exception.ConflictException;
+import com.tus.cliniccare.exception.ResourceNotFoundException;
 import com.tus.cliniccare.repository.AppointmentRepository;
 import com.tus.cliniccare.repository.DoctorRepository;
 import com.tus.cliniccare.repository.DoctorServiceRepository;
@@ -44,7 +48,12 @@ public class AppointmentService {
         this.timeSlotRepository = timeSlotRepository;
     }
 
-    public List<Appointment> getAppointmentsByPatient(Long patientId) {
+    public List<Appointment> getAppointmentsByPatient(String patientEmail) {
+        User patient = getUserByEmail(patientEmail);
+        if (patient.getRole() != Role.PATIENT) {
+            throw new BadRequestException("Only patients can view patient appointment history.");
+        }
+        Long patientId = patient.getId();
         return appointmentRepository.findByPatientId(patientId);
     }
 
@@ -61,30 +70,39 @@ public class AppointmentService {
     }
 
     @Transactional
-    public Appointment bookAppointment(Long patientId, Long doctorId, Long serviceId, Long timeSlotId, String patientNote) {
-        if (isTimeSlotBooked(timeSlotId)) {
-            throw new IllegalStateException("Selected time slot is already booked.");
+    public Appointment bookAppointment(
+            String patientEmail,
+            Long doctorId,
+            Long serviceId,
+            Long timeSlotId,
+            String patientNote
+    ) {
+        User patient = getUserByEmail(patientEmail);
+        if (patient.getRole() != Role.PATIENT) {
+            throw new BadRequestException("Only patients can book appointments.");
         }
 
-        User patient = userRepository.findById(patientId)
-                .orElseThrow(() -> new IllegalArgumentException("Patient not found."));
+        if (isTimeSlotBooked(timeSlotId)) {
+            throw new ConflictException("Selected time slot is already booked.");
+        }
+
         Doctor doctor = doctorRepository.findById(doctorId)
-                .orElseThrow(() -> new IllegalArgumentException("Doctor not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found."));
         ServiceEntity service = serviceRepository.findById(serviceId)
-                .orElseThrow(() -> new IllegalArgumentException("Service not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("Service not found."));
         TimeSlot timeSlot = timeSlotRepository.findById(timeSlotId)
-                .orElseThrow(() -> new IllegalArgumentException("Time slot not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("Time slot not found."));
 
         if (!doctorId.equals(timeSlot.getDoctor().getId())) {
-            throw new IllegalArgumentException("Time slot does not belong to the selected doctor.");
+            throw new BadRequestException("Time slot does not belong to the selected doctor.");
         }
 
         if (!doctorServiceRepository.existsByDoctorIdAndServiceId(doctorId, serviceId)) {
-            throw new IllegalArgumentException("Selected doctor does not provide the selected service.");
+            throw new BadRequestException("Selected doctor does not provide the selected service.");
         }
 
         if (timeSlot.getStatus() != TimeSlotStatus.AVAILABLE) {
-            throw new IllegalStateException("Time slot is not available.");
+            throw new ConflictException("Time slot is not available.");
         }
 
         Appointment appointment = new Appointment();
@@ -102,16 +120,18 @@ public class AppointmentService {
     }
 
     @Transactional
-    public Appointment confirmAppointment(Long appointmentId) {
+    public Appointment confirmAppointment(Long appointmentId, String actorEmail, boolean isAdmin) {
         Appointment appointment = getAppointmentById(appointmentId);
+        validateDoctorOwnership(appointment, actorEmail, isAdmin);
         validateTransition(appointment.getStatus(), AppointmentStatus.CONFIRMED);
         appointment.setStatus(AppointmentStatus.CONFIRMED);
         return appointmentRepository.save(appointment);
     }
 
     @Transactional
-    public Appointment rejectAppointment(Long appointmentId) {
+    public Appointment rejectAppointment(Long appointmentId, String actorEmail, boolean isAdmin) {
         Appointment appointment = getAppointmentById(appointmentId);
+        validateDoctorOwnership(appointment, actorEmail, isAdmin);
         validateTransition(appointment.getStatus(), AppointmentStatus.REJECTED);
         appointment.setStatus(AppointmentStatus.REJECTED);
 
@@ -124,8 +144,9 @@ public class AppointmentService {
     }
 
     @Transactional
-    public Appointment completeAppointment(Long appointmentId) {
+    public Appointment completeAppointment(Long appointmentId, String actorEmail, boolean isAdmin) {
         Appointment appointment = getAppointmentById(appointmentId);
+        validateDoctorOwnership(appointment, actorEmail, isAdmin);
         validateTransition(appointment.getStatus(), AppointmentStatus.COMPLETED);
         appointment.setStatus(AppointmentStatus.COMPLETED);
         return appointmentRepository.save(appointment);
@@ -133,7 +154,30 @@ public class AppointmentService {
 
     private Appointment getAppointmentById(Long appointmentId) {
         return appointmentRepository.findById(appointmentId)
-                .orElseThrow(() -> new IllegalArgumentException("Appointment not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found."));
+    }
+
+    private User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found."));
+    }
+
+    private void validateDoctorOwnership(Appointment appointment, String actorEmail, boolean isAdmin) {
+        if (isAdmin) {
+            return;
+        }
+
+        User actor = getUserByEmail(actorEmail);
+        if (actor.getRole() != Role.DOCTOR) {
+            throw new BadRequestException("Only a doctor can perform this action.");
+        }
+
+        Doctor doctor = doctorRepository.findByUserId(actor.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor profile not found for the authenticated user."));
+
+        if (!doctor.getId().equals(appointment.getDoctor().getId())) {
+            throw new BadRequestException("You can only manage appointments assigned to you.");
+        }
     }
 
     private void validateTransition(AppointmentStatus currentStatus, AppointmentStatus targetStatus) {
@@ -143,7 +187,7 @@ public class AppointmentService {
                         || (currentStatus == AppointmentStatus.CONFIRMED && targetStatus == AppointmentStatus.COMPLETED);
 
         if (!allowed) {
-            throw new IllegalStateException(
+            throw new BadRequestException(
                     "Invalid appointment status transition: " + currentStatus + " -> " + targetStatus
             );
         }

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping({"/admin/timeslots", "/api/admin/timeslots"})
+@RequestMapping("/api/admin/timeslots")
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminTimeSlotController {
 

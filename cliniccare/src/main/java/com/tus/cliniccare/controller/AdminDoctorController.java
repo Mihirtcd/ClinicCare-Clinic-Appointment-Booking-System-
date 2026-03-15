@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping({"/admin/doctors", "/api/admin/doctors"})
+@RequestMapping("/api/admin/doctors")
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminDoctorController {
 

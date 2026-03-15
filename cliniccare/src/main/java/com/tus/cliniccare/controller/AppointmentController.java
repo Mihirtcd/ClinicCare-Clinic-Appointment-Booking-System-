@@ -8,6 +8,7 @@ import com.tus.cliniccare.service.AppointmentService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping({"/appointments", "/api/appointments"})
+@RequestMapping("/api/appointments")
 public class AppointmentController {
 
     private final AppointmentService appointmentService;
@@ -26,8 +27,15 @@ public class AppointmentController {
 
     @PatchMapping("/{id}/confirm")
     @PreAuthorize("hasAnyRole('DOCTOR','ADMIN')")
-    public ResponseEntity<AppointmentResponse> confirmAppointment(@PathVariable Long id) {
-        Appointment appointment = appointmentService.confirmAppointment(id);
+    public ResponseEntity<AppointmentResponse> confirmAppointment(
+            @PathVariable Long id,
+            Authentication authentication
+    ) {
+        Appointment appointment = appointmentService.confirmAppointment(
+                id,
+                authentication.getName(),
+                isAdmin(authentication)
+        );
         return ResponseEntity.ok(toAppointmentResponse(appointment));
     }
 
@@ -35,21 +43,38 @@ public class AppointmentController {
     @PreAuthorize("hasAnyRole('DOCTOR','ADMIN')")
     public ResponseEntity<AppointmentResponse> rejectAppointment(
             @PathVariable Long id,
-            @Valid @RequestBody RejectAppointmentRequest request
+            @Valid @RequestBody RejectAppointmentRequest request,
+            Authentication authentication
     ) {
         if (request.getAppointmentId() != null && !id.equals(request.getAppointmentId())) {
             throw new BadRequestException("Appointment id in path and body must match.");
         }
 
-        Appointment appointment = appointmentService.rejectAppointment(id);
+        Appointment appointment = appointmentService.rejectAppointment(
+                id,
+                authentication.getName(),
+                isAdmin(authentication)
+        );
         return ResponseEntity.ok(toAppointmentResponse(appointment));
     }
 
     @PatchMapping("/{id}/complete")
     @PreAuthorize("hasAnyRole('DOCTOR','ADMIN')")
-    public ResponseEntity<AppointmentResponse> completeAppointment(@PathVariable Long id) {
-        Appointment appointment = appointmentService.completeAppointment(id);
+    public ResponseEntity<AppointmentResponse> completeAppointment(
+            @PathVariable Long id,
+            Authentication authentication
+    ) {
+        Appointment appointment = appointmentService.completeAppointment(
+                id,
+                authentication.getName(),
+                isAdmin(authentication)
+        );
         return ResponseEntity.ok(toAppointmentResponse(appointment));
+    }
+
+    private boolean isAdmin(Authentication authentication) {
+        return authentication.getAuthorities().stream()
+                .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
     }
 
     private AppointmentResponse toAppointmentResponse(Appointment appointment) {
