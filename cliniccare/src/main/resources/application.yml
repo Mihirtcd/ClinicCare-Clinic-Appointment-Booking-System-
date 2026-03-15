@@ -1,0 +1,39 @@
+# Core Spring Boot configuration
+spring:
+  # MySQL datasource (values can be overridden via environment variables)
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/cliniccare_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    # Keep DB credentials in environment variables (not in Git)
+    username: ${DB_USERNAME:}
+    password: ${DB_PASSWORD:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  # JPA/Hibernate behavior for local development
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    # Run SQL seed script after Hibernate creates/updates schema
+    defer-datasource-initialization: true
+
+  # Always execute data.sql on startup
+  sql:
+    init:
+      mode: always
+
+# JWT properties consumed by JwtService
+app:
+  jwt:
+    # Keep JWT secret in environment variables (not in Git)
+    secret: ${APP_JWT_SECRET:}
+    expiration-minutes: ${APP_JWT_EXPIRATION_MINUTES:1440}
+
+# SQL logging for development/debugging
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
