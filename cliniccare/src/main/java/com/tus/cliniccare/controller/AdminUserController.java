@@ -1,0 +1,64 @@
+package com.tus.cliniccare.controller;
+
+import com.tus.cliniccare.dto.request.CreateAdminUserRequest;
+import com.tus.cliniccare.dto.response.UserResponse;
+import com.tus.cliniccare.entity.User;
+import com.tus.cliniccare.entity.enums.Role;
+import com.tus.cliniccare.service.UserService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/admin/users")
+@PreAuthorize("hasRole('ADMIN')")
+public class AdminUserController {
+
+    private final UserService userService;
+
+    public AdminUserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<UserResponse>> getUsers(@RequestParam(required = false) Role role) {
+        List<User> users = role == null ? userService.getAllUsers() : userService.getUsersByRole(role);
+        List<UserResponse> responses = users.stream()
+                .map(this::toUserResponse)
+                .toList();
+        return ResponseEntity.ok(responses);
+    }
+
+    @PostMapping
+    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateAdminUserRequest request) {
+        User user = userService.createUserByAdmin(
+                request.getFirstName(),
+                request.getLastName(),
+                request.getEmail(),
+                request.getPassword(),
+                request.getPhoneNumber(),
+                request.getRole()
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(toUserResponse(user));
+    }
+
+    private UserResponse toUserResponse(User user) {
+        UserResponse response = new UserResponse();
+        response.setId(user.getId());
+        response.setFirstName(user.getFirstName());
+        response.setLastName(user.getLastName());
+        response.setEmail(user.getEmail());
+        response.setPhoneNumber(user.getPhoneNumber());
+        response.setRole(user.getRole());
+        return response;
+    }
+}
