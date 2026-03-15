@@ -44,11 +44,12 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
-                        .requestMatchers("/api/admin/**").hasRole(ADMIN)
-                        .requestMatchers("/api/doctor/**").hasAnyRole("DOCTOR", ADMIN)
-                        .requestMatchers("/api/patient/**").hasAnyRole("PATIENT", ADMIN)
+                        .requestMatchers("/admin/**", "/api/admin/**").hasRole(ADMIN)
+                        .requestMatchers("/doctor/**", "/api/doctor/**").hasAnyRole("DOCTOR", ADMIN)
+                        .requestMatchers("/patient/**", "/api/patient/**").hasAnyRole("PATIENT", ADMIN)
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
