@@ -1,0 +1,46 @@
+body {
+  background-color: #f5f7fb;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.page-title {
+  font-weight: 700;
+  color: #1f2a44;
+}
+
+.card-metric {
+  border: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.metric-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.table-actions .btn {
+  margin-right: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.auth-card {
+  max-width: 460px;
+}
+
+.small-muted {
+  font-size: 0.88rem;
+  color: #6c757d;
+}
+
+.badge-status {
+  font-size: 0.78rem;
+}
+
+.required::after {
+  content: " *";
+  color: #dc3545;
+}
