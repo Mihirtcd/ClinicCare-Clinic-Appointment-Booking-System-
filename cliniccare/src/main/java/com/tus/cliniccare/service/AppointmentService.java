@@ -20,6 +20,7 @@ import com.tus.cliniccare.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -59,6 +60,24 @@ public class AppointmentService {
 
     public List<Appointment> getAppointmentsByDoctor(Long doctorId) {
         return appointmentRepository.findByDoctorId(doctorId);
+    }
+
+    public List<Appointment> getAppointmentsByDoctor(String doctorEmail) {
+        User doctorUser = getUserByEmail(doctorEmail);
+        if (doctorUser.getRole() != Role.DOCTOR) {
+            throw new BadRequestException("Only doctors can view doctor appointment history.");
+        }
+
+        Doctor doctor = doctorRepository.findByUserId(doctorUser.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor profile not found for the authenticated user."));
+
+        return appointmentRepository.findByDoctorId(doctor.getId());
+    }
+
+    public List<Appointment> getAppointmentsByDoctorAndStatus(String doctorEmail, AppointmentStatus status) {
+        return getAppointmentsByDoctor(doctorEmail).stream()
+                .filter(appointment -> appointment.getStatus() == status)
+                .toList();
     }
 
     public List<Appointment> getAppointmentsByStatus(AppointmentStatus status) {
@@ -148,6 +167,12 @@ public class AppointmentService {
         Appointment appointment = getAppointmentById(appointmentId);
         validateDoctorOwnership(appointment, actorEmail, isAdmin);
         validateTransition(appointment.getStatus(), AppointmentStatus.COMPLETED);
+
+        LocalDateTime slotEndTime = appointment.getTimeSlot().getEndTime();
+        if (slotEndTime != null && LocalDateTime.now().isBefore(slotEndTime)) {
+            throw new BadRequestException("Appointment can be completed only after the scheduled slot ends.");
+        }
+
         appointment.setStatus(AppointmentStatus.COMPLETED);
         return appointmentRepository.save(appointment);
     }

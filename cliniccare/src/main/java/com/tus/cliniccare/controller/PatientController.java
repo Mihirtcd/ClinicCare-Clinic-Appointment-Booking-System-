@@ -2,12 +2,15 @@ package com.tus.cliniccare.controller;
 
 import com.tus.cliniccare.dto.request.BookAppointmentRequest;
 import com.tus.cliniccare.dto.response.AppointmentResponse;
+import com.tus.cliniccare.dto.response.DoctorResponse;
 import com.tus.cliniccare.dto.response.ServiceResponse;
 import com.tus.cliniccare.dto.response.TimeSlotResponse;
 import com.tus.cliniccare.entity.Appointment;
+import com.tus.cliniccare.entity.Doctor;
 import com.tus.cliniccare.entity.ServiceEntity;
 import com.tus.cliniccare.entity.TimeSlot;
 import com.tus.cliniccare.service.AppointmentService;
+import com.tus.cliniccare.service.DoctorService;
 import com.tus.cliniccare.service.ServiceEntityService;
 import com.tus.cliniccare.service.TimeSlotService;
 import jakarta.validation.Valid;
@@ -30,15 +33,18 @@ import java.util.List;
 public class PatientController {
 
     private final ServiceEntityService serviceEntityService;
+    private final DoctorService doctorService;
     private final TimeSlotService timeSlotService;
     private final AppointmentService appointmentService;
 
     public PatientController(
             ServiceEntityService serviceEntityService,
+            DoctorService doctorService,
             TimeSlotService timeSlotService,
             AppointmentService appointmentService
     ) {
         this.serviceEntityService = serviceEntityService;
+        this.doctorService = doctorService;
         this.timeSlotService = timeSlotService;
         this.appointmentService = appointmentService;
     }
@@ -48,6 +54,15 @@ public class PatientController {
         List<ServiceResponse> responses = serviceEntityService.getEnabledServices()
                 .stream()
                 .map(this::toServiceResponse)
+                .toList();
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/doctors")
+    public ResponseEntity<List<DoctorResponse>> getDoctorsForBooking() {
+        List<DoctorResponse> responses = doctorService.getAllDoctors()
+                .stream()
+                .map(this::toDoctorResponse)
                 .toList();
         return ResponseEntity.ok(responses);
     }
@@ -95,6 +110,21 @@ public class PatientController {
         return response;
     }
 
+    private DoctorResponse toDoctorResponse(Doctor doctor) {
+        DoctorResponse response = new DoctorResponse();
+        response.setId(doctor.getId());
+        response.setUserId(doctor.getUser().getId());
+        response.setFirstName(doctor.getUser().getFirstName());
+        response.setLastName(doctor.getUser().getLastName());
+        response.setSpecialization(doctor.getSpecialization());
+        response.setServiceIds(
+                doctorService.getDoctorServices(doctor.getId()).stream()
+                        .map(doctorServiceEntity -> doctorServiceEntity.getService().getId())
+                        .toList()
+        );
+        return response;
+    }
+
     private TimeSlotResponse toTimeSlotResponse(TimeSlot slot) {
         TimeSlotResponse response = new TimeSlotResponse();
         response.setId(slot.getId());
@@ -109,9 +139,22 @@ public class PatientController {
         AppointmentResponse response = new AppointmentResponse();
         response.setId(appointment.getId());
         response.setPatientId(appointment.getPatient().getId());
+        response.setPatientName(
+                ((appointment.getPatient().getFirstName() == null ? "" : appointment.getPatient().getFirstName()) + " "
+                        + (appointment.getPatient().getLastName() == null ? "" : appointment.getPatient().getLastName()))
+                        .trim()
+        );
         response.setDoctorId(appointment.getDoctor().getId());
+        response.setDoctorName(
+                ((appointment.getDoctor().getUser().getFirstName() == null ? "" : appointment.getDoctor().getUser().getFirstName()) + " "
+                        + (appointment.getDoctor().getUser().getLastName() == null ? "" : appointment.getDoctor().getUser().getLastName()))
+                        .trim()
+        );
         response.setServiceId(appointment.getService().getId());
+        response.setServiceName(appointment.getService().getName());
         response.setTimeSlotId(appointment.getTimeSlot().getId());
+        response.setSlotStartTime(appointment.getTimeSlot().getStartTime());
+        response.setSlotEndTime(appointment.getTimeSlot().getEndTime());
         response.setStatus(appointment.getStatus());
         response.setPatientNote(appointment.getPatientNote());
         response.setBookedAt(appointment.getBookedAt());
