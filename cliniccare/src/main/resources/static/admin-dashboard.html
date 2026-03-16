@@ -5,100 +5,105 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ClinicCare - Admin Dashboard</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
   <link href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css" rel="stylesheet">
   <link href="assets/css/app.css" rel="stylesheet">
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <div class="container">
-    <a class="navbar-brand" href="admin-dashboard.html">ClinicCare Admin</a>
-    <div class="navbar-nav ms-auto">
-      <a class="nav-link active" href="admin-dashboard.html">Dashboard</a>
-      <a class="nav-link" href="admin-users.html">Users</a>
-      <a class="nav-link" href="admin-doctors.html">Doctors</a>
-      <a class="nav-link" href="admin-services.html">Services</a>
-      <a class="nav-link" href="admin-timeslots.html">Time Slots</a>
-      <button class="btn btn-sm btn-light ms-2" id="logoutBtn">Logout</button>
-    </div>
-  </div>
-</nav>
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <div class="admin-brand">ClinicCare Admin</div>
+    <nav class="admin-nav">
+      <a class="admin-nav-link" href="index.html"><i class="bi bi-house-door me-2"></i>Home</a>
+      <a class="admin-nav-link active" href="admin-dashboard.html"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
+      <a class="admin-nav-link" href="admin-users.html"><i class="bi bi-people me-2"></i>Users</a>
+      <a class="admin-nav-link" href="admin-doctors.html"><i class="bi bi-person-badge me-2"></i>Doctors</a>
+      <a class="admin-nav-link" href="admin-services.html"><i class="bi bi-clipboard2-pulse me-2"></i>Services</a>
+      <a class="admin-nav-link" href="admin-timeslots.html"><i class="bi bi-clock-history me-2"></i>Time Slots</a>
+    </nav>
+    <button class="btn btn-sm btn-light mt-auto" id="logoutBtn"><i class="bi bi-box-arrow-right me-1"></i>Logout</button>
+  </aside>
 
-<main class="container py-4">
-  <h3 class="page-title mb-4">Admin Dashboard</h3>
-  <div id="alertBox"></div>
+  <main class="admin-content">
+    <div class="admin-page-head">
+      <h3 class="page-title mb-0">Admin Dashboard</h3>
+    </div>
+    <div id="alertBox"></div>
 
-  <div class="row g-3 mb-4">
-    <div class="col-md-3">
-      <div class="card card-metric">
-        <div class="card-body">
-          <div class="small text-muted">Total Users</div>
-          <div class="metric-value" id="totalUsers">0</div>
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <div class="card card-metric">
+          <div class="card-body">
+            <div class="small text-muted">Total Users</div>
+            <div class="metric-value" id="totalUsers">0</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card card-metric">
+          <div class="card-body">
+            <div class="small text-muted">Doctors</div>
+            <div class="metric-value" id="doctorCount">0</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card card-metric">
+          <div class="card-body">
+            <div class="small text-muted">Total Services</div>
+            <div class="metric-value" id="serviceCount">0</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card card-metric">
+          <div class="card-body">
+            <div class="small text-muted">Total Appointments</div>
+            <div class="metric-value" id="totalAppointments">0</div>
+          </div>
         </div>
       </div>
     </div>
-    <div class="col-md-3">
-      <div class="card card-metric">
-        <div class="card-body">
-          <div class="small text-muted">Doctors</div>
-          <div class="metric-value" id="doctorCount">0</div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card card-metric">
-        <div class="card-body">
-          <div class="small text-muted">Total Services</div>
-          <div class="metric-value" id="serviceCount">0</div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card card-metric">
-        <div class="card-body">
-          <div class="small text-muted">Enabled Services</div>
-          <div class="metric-value" id="enabledServiceCount">0</div>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <div class="row g-3 mb-4">
-    <div class="col-lg-6">
-      <div class="card">
-        <div class="card-header bg-white">User Role Distribution</div>
-        <div class="card-body">
-          <canvas id="userRoleChart" height="220"></canvas>
+    <div class="row g-3 mb-4">
+      <div class="col-lg-6">
+        <div class="card chart-panel">
+          <div class="card-header bg-white">User Role Distribution</div>
+          <div class="card-body">
+            <canvas id="userRoleChart" class="chart-canvas"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="card chart-panel">
+          <div class="card-header bg-white">Appointment Status Distribution</div>
+          <div class="card-body">
+            <canvas id="appointmentStatusChart" class="chart-canvas"></canvas>
+          </div>
         </div>
       </div>
     </div>
-    <div class="col-lg-6">
-      <div class="card">
-        <div class="card-header bg-white">Service Status</div>
-        <div class="card-body">
-          <canvas id="serviceChart" height="220"></canvas>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <div class="card">
-    <div class="card-header bg-white">Users Snapshot</div>
-    <div class="card-body">
-      <table class="table table-striped" id="usersTable" style="width:100%">
-        <thead>
-        <tr>
-          <th>Sr. No.</th>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Role</th>
-          <th>Phone</th>
-        </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+    <div class="card table-fit">
+      <div class="card-header bg-white">Users Snapshot</div>
+      <div class="card-body">
+        <table class="table table-striped" id="usersTable" style="width:100%">
+          <thead>
+          <tr>
+            <th>Sr. No.</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Phone</th>
+          </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
-  </div>
-</main>
+  </main>
+</div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -108,9 +113,9 @@
 <script>
   let usersTable;
   let userRoleChart;
-  let serviceChart;
+  let appointmentStatusChart;
 
-  function renderCharts(users, services) {
+  function renderCharts(users, appointmentStats) {
     const roleCounts = {
       PATIENT: 0,
       DOCTOR: 0,
@@ -120,14 +125,11 @@
       roleCounts[u.role] = (roleCounts[u.role] || 0) + 1;
     });
 
-    const enabled = (services || []).filter(function (s) { return s.isEnabled; }).length;
-    const disabled = (services || []).length - enabled;
-
     if (userRoleChart) {
       userRoleChart.destroy();
     }
-    if (serviceChart) {
-      serviceChart.destroy();
+    if (appointmentStatusChart) {
+      appointmentStatusChart.destroy();
     }
 
     userRoleChart = new Chart(document.getElementById("userRoleChart"), {
@@ -138,17 +140,38 @@
           data: [roleCounts.PATIENT, roleCounts.DOCTOR, roleCounts.ADMIN],
           backgroundColor: ["#0d6efd", "#198754", "#212529"]
         }]
+      },
+      options: {
+        maintainAspectRatio: false
       }
     });
 
-    serviceChart = new Chart(document.getElementById("serviceChart"), {
-      type: "doughnut",
+    appointmentStatusChart = new Chart(document.getElementById("appointmentStatusChart"), {
+      type: "bar",
       data: {
-        labels: ["Enabled", "Disabled"],
+        labels: ["PENDING", "CONFIRMED", "REJECTED", "COMPLETED", "CANCELLED"],
         datasets: [{
-          data: [enabled, disabled],
-          backgroundColor: ["#20c997", "#dc3545"]
+          label: "Appointments",
+          data: [
+            appointmentStats.pending || 0,
+            appointmentStats.confirmed || 0,
+            appointmentStats.rejected || 0,
+            appointmentStats.completed || 0,
+            appointmentStats.cancelled || 0
+          ],
+          backgroundColor: ["#ffc107", "#0dcaf0", "#dc3545", "#198754", "#6c757d"]
         }]
+      },
+      options: {
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0
+            }
+          }
+        }
       }
     });
   }
@@ -157,16 +180,18 @@
     $.when(
       ClinicCare.api({ url: "/admin/users" }),
       ClinicCare.api({ url: "/admin/doctors" }),
-      ClinicCare.api({ url: "/admin/services" })
-    ).done(function (usersResp, doctorsResp, servicesResp) {
+      ClinicCare.api({ url: "/admin/services" }),
+      ClinicCare.api({ url: "/admin/appointments/stats" })
+    ).done(function (usersResp, doctorsResp, servicesResp, statsResp) {
       const users = usersResp[0] || [];
       const doctors = doctorsResp[0] || [];
       const services = servicesResp[0] || [];
+      const appointmentStats = statsResp[0] || {};
 
       $("#totalUsers").text(users.length);
       $("#doctorCount").text(doctors.length);
       $("#serviceCount").text(services.length);
-      $("#enabledServiceCount").text(services.filter(function (x) { return x.isEnabled; }).length);
+      $("#totalAppointments").text(appointmentStats.total || 0);
 
       usersTable.clear();
       users.forEach(function (u, index) {
@@ -180,7 +205,7 @@
       });
       usersTable.draw();
 
-      renderCharts(users, services);
+      renderCharts(users, appointmentStats);
     }).fail(function (xhr) {
       ClinicCare.showAlert("#alertBox", "danger", ClinicCare.extractErrorMessage(xhr));
     });
@@ -193,6 +218,8 @@
 
     usersTable = $("#usersTable").DataTable({
       order: [[1, "asc"]],
+      scrollY: "30vh",
+      scrollCollapse: true,
       columnDefs: [
         { targets: 3, orderable: false }
       ]

@@ -2,6 +2,10 @@ body {
   background-color: #f5f7fb;
 }
 
+.bi {
+  vertical-align: -0.125em;
+}
+
 .navbar-brand {
   font-weight: 700;
   letter-spacing: 0.3px;
@@ -15,6 +19,13 @@ body {
 .card-metric {
   border: 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.card-metric .card-body {
+  min-height: 92px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .metric-value {
@@ -43,4 +54,348 @@ body {
 .required::after {
   content: " *";
   color: #dc3545;
+}
+
+.admin-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.admin-sidebar {
+  width: 250px;
+  background: #111827;
+  color: #e5e7eb;
+  padding: 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.admin-brand {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #f8fafc;
+  letter-spacing: 0.3px;
+}
+
+.admin-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 1.25rem;
+}
+
+.admin-nav-link {
+  color: #cbd5e1;
+  text-decoration: none;
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.5rem;
+  transition: all 0.15s ease;
+}
+
+.admin-nav-link:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.admin-nav-link.active {
+  color: #ffffff;
+  background: #0d6efd;
+}
+
+.admin-content {
+  flex: 1;
+  min-width: 0;
+  padding: 1.4rem 1.5rem;
+  overflow-y: auto;
+}
+
+.admin-page-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.table-fit .dataTables_wrapper .dataTables_scroll {
+  border: 1px solid #e9ecef;
+  border-radius: 0.35rem;
+}
+
+.table-fit .dataTables_wrapper .dataTables_scrollBody {
+  border-bottom: 0;
+}
+
+.chart-panel .card-body {
+  height: 360px;
+}
+
+.chart-canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+body.landing-page {
+  background:
+    radial-gradient(circle at top right, rgba(13, 110, 253, 0.12), transparent 40%),
+    radial-gradient(circle at top left, rgba(13, 202, 240, 0.1), transparent 45%),
+    #f5f7fb;
+  color: #1f2a44;
+}
+
+.landing-header {
+  border-bottom: 1px solid #e6ebf5;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(5px);
+}
+
+.landing-navbar .navbar-toggler {
+  border-color: #c7d2fe;
+}
+
+.landing-navbar .navbar-toggler:focus {
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+
+.landing-brand {
+  color: #1f2a44;
+  font-weight: 700;
+}
+
+.landing-nav-link {
+  color: #4b5563;
+  font-weight: 500;
+}
+
+.landing-nav-link:hover,
+.landing-nav-link.active {
+  color: #0d6efd;
+}
+
+.landing-badge {
+  display: inline-block;
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #0b5ed7;
+  background: rgba(13, 110, 253, 0.12);
+}
+
+.landing-hero-section {
+  padding-top: 1rem;
+}
+
+.landing-title {
+  font-size: clamp(1.9rem, 2.7vw, 2.85rem);
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.landing-subtitle {
+  margin-top: 0.95rem;
+  color: #4b5563;
+  max-width: 640px;
+}
+
+.landing-cta {
+  min-width: 170px;
+}
+
+.landing-trust {
+  color: #374151;
+  font-size: 0.95rem;
+}
+
+.landing-hero-panel {
+  border: 1px solid #e4eaf5;
+  box-shadow: 0 8px 20px rgba(31, 42, 68, 0.08);
+  border-radius: 0.85rem;
+}
+
+.landing-flow-step {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px dashed #d8dee9;
+  color: #374151;
+}
+
+.landing-flow-step:last-of-type {
+  border-bottom: 0;
+}
+
+.landing-flow-step span {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #0d6efd;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.landing-section {
+  padding: 2.8rem 0;
+}
+
+.landing-section-soft {
+  background: #ffffff;
+  border-top: 1px solid #e9eef7;
+  border-bottom: 1px solid #e9eef7;
+}
+
+.landing-section-title {
+  font-size: clamp(1.35rem, 1.9vw, 2rem);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.landing-section-subtitle {
+  color: #4b5563;
+  margin-bottom: 0;
+}
+
+.landing-service-card {
+  border: 1px solid #e9eef7;
+  box-shadow: 0 6px 16px rgba(17, 24, 39, 0.05);
+  border-radius: 0.8rem;
+}
+
+.landing-service-card h5 {
+  margin: 0.8rem 0 0.55rem;
+  font-size: 1.1rem;
+}
+
+.landing-service-card p {
+  color: #4b5563;
+  margin-bottom: 0;
+}
+
+.landing-icon-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(13, 110, 253, 0.12);
+  color: #0b5ed7;
+  font-size: 1.1rem;
+}
+
+.landing-benefits-list {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 0;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.landing-benefits-list li {
+  display: flex;
+  gap: 0.55rem;
+  color: #374151;
+}
+
+.landing-benefits-list i {
+  color: #198754;
+  margin-top: 0.12rem;
+}
+
+.landing-info-card {
+  border: 1px solid #e4eaf5;
+  border-radius: 0.85rem;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+}
+
+.landing-step {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px dashed #d8dee9;
+  color: #374151;
+}
+
+.landing-step:last-child {
+  border-bottom: 0;
+}
+
+.landing-step span {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #0d6efd;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.landing-footer {
+  border-top: 1px solid #e5ebf6;
+  background: #ffffff;
+  color: #6b7280;
+  font-size: 0.92rem;
+}
+
+.landing-footer-links {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.landing-footer-links a {
+  color: #4b5563;
+  text-decoration: none;
+}
+
+.landing-footer-links a:hover {
+  color: #0d6efd;
+}
+
+.landing-footer-bottom {
+  border-top: 1px solid #eef2f7;
+  color: #8b95a5;
+}
+
+@media (max-width: 991.98px) {
+  .admin-shell {
+    flex-direction: column;
+  }
+
+  .admin-sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+
+  .admin-content {
+    padding: 1rem;
+  }
+
+  .chart-panel .card-body {
+    height: 300px;
+  }
+
+  .landing-title {
+    font-size: 1.7rem;
+  }
+
+  .landing-nav-link {
+    padding: 0.45rem 0;
+  }
+
+  .landing-section {
+    padding: 2.1rem 0;
+  }
 }
