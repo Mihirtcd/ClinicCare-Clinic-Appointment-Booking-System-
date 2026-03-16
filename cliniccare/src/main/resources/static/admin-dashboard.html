@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClinicCare - Admin Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css" rel="stylesheet">
+  <link href="assets/css/app.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand" href="admin-dashboard.html">ClinicCare Admin</a>
+    <div class="navbar-nav ms-auto">
+      <a class="nav-link active" href="admin-dashboard.html">Dashboard</a>
+      <a class="nav-link" href="admin-users.html">Users</a>
+      <a class="nav-link" href="admin-doctors.html">Doctors</a>
+      <a class="nav-link" href="admin-services.html">Services</a>
+      <a class="nav-link" href="admin-timeslots.html">Time Slots</a>
+      <button class="btn btn-sm btn-light ms-2" id="logoutBtn">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<main class="container py-4">
+  <h3 class="page-title mb-4">Admin Dashboard</h3>
+  <div id="alertBox"></div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="card card-metric">
+        <div class="card-body">
+          <div class="small text-muted">Total Users</div>
+          <div class="metric-value" id="totalUsers">0</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card card-metric">
+        <div class="card-body">
+          <div class="small text-muted">Doctors</div>
+          <div class="metric-value" id="doctorCount">0</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card card-metric">
+        <div class="card-body">
+          <div class="small text-muted">Total Services</div>
+          <div class="metric-value" id="serviceCount">0</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card card-metric">
+        <div class="card-body">
+          <div class="small text-muted">Enabled Services</div>
+          <div class="metric-value" id="enabledServiceCount">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-header bg-white">User Role Distribution</div>
+        <div class="card-body">
+          <canvas id="userRoleChart" height="220"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-header bg-white">Service Status</div>
+        <div class="card-body">
+          <canvas id="serviceChart" height="220"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header bg-white">Users Snapshot</div>
+    <div class="card-body">
+      <table class="table table-striped" id="usersTable" style="width:100%">
+        <thead>
+        <tr>
+          <th>Sr. No.</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Phone</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+  let usersTable;
+  let userRoleChart;
+  let serviceChart;
+
+  function renderCharts(users, services) {
+    const roleCounts = {
+      PATIENT: 0,
+      DOCTOR: 0,
+      ADMIN: 0
+    };
+    (users || []).forEach(function (u) {
+      roleCounts[u.role] = (roleCounts[u.role] || 0) + 1;
+    });
+
+    const enabled = (services || []).filter(function (s) { return s.isEnabled; }).length;
+    const disabled = (services || []).length - enabled;
+
+    if (userRoleChart) {
+      userRoleChart.destroy();
+    }
+    if (serviceChart) {
+      serviceChart.destroy();
+    }
+
+    userRoleChart = new Chart(document.getElementById("userRoleChart"), {
+      type: "pie",
+      data: {
+        labels: ["PATIENT", "DOCTOR", "ADMIN"],
+        datasets: [{
+          data: [roleCounts.PATIENT, roleCounts.DOCTOR, roleCounts.ADMIN],
+          backgroundColor: ["#0d6efd", "#198754", "#212529"]
+        }]
+      }
+    });
+
+    serviceChart = new Chart(document.getElementById("serviceChart"), {
+      type: "doughnut",
+      data: {
+        labels: ["Enabled", "Disabled"],
+        datasets: [{
+          data: [enabled, disabled],
+          backgroundColor: ["#20c997", "#dc3545"]
+        }]
+      }
+    });
+  }
+
+  function loadDashboard() {
+    $.when(
+      ClinicCare.api({ url: "/admin/users" }),
+      ClinicCare.api({ url: "/admin/doctors" }),
+      ClinicCare.api({ url: "/admin/services" })
+    ).done(function (usersResp, doctorsResp, servicesResp) {
+      const users = usersResp[0] || [];
+      const doctors = doctorsResp[0] || [];
+      const services = servicesResp[0] || [];
+
+      $("#totalUsers").text(users.length);
+      $("#doctorCount").text(doctors.length);
+      $("#serviceCount").text(services.length);
+      $("#enabledServiceCount").text(services.filter(function (x) { return x.isEnabled; }).length);
+
+      usersTable.clear();
+      users.forEach(function (u, index) {
+        usersTable.row.add([
+          index + 1,
+          (u.firstName || "") + " " + (u.lastName || ""),
+          u.email || "",
+          ClinicCare.statusBadge(u.role),
+          u.phoneNumber || ""
+        ]);
+      });
+      usersTable.draw();
+
+      renderCharts(users, services);
+    }).fail(function (xhr) {
+      ClinicCare.showAlert("#alertBox", "danger", ClinicCare.extractErrorMessage(xhr));
+    });
+  }
+
+  $(function () {
+    if (!ClinicCare.requireAuth(["ADMIN"])) {
+      return;
+    }
+
+    usersTable = $("#usersTable").DataTable({
+      order: [[1, "asc"]],
+      columnDefs: [
+        { targets: 3, orderable: false }
+      ]
+    });
+
+    $("#logoutBtn").on("click", ClinicCare.logout);
+    loadDashboard();
+  });
+</script>
+</body>
+</html>
