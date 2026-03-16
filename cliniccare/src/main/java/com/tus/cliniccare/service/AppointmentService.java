@@ -84,6 +84,14 @@ public class AppointmentService {
         return appointmentRepository.findByStatus(status);
     }
 
+    public long getTotalAppointmentsCount() {
+        return appointmentRepository.count();
+    }
+
+    public long getAppointmentsCountByStatus(AppointmentStatus status) {
+        return appointmentRepository.countByStatus(status);
+    }
+
     public boolean isTimeSlotBooked(Long timeSlotId) {
         return appointmentRepository.existsByTimeSlotId(timeSlotId);
     }
@@ -174,6 +182,40 @@ public class AppointmentService {
         }
 
         appointment.setStatus(AppointmentStatus.COMPLETED);
+        return appointmentRepository.save(appointment);
+    }
+
+    @Transactional
+    public Appointment cancelAppointmentByPatient(Long appointmentId, String patientEmail) {
+        User patient = getUserByEmail(patientEmail);
+        if (patient.getRole() != Role.PATIENT) {
+            throw new BadRequestException("Only patients can cancel appointments.");
+        }
+
+        Appointment appointment = getAppointmentById(appointmentId);
+        if (!appointment.getPatient().getId().equals(patient.getId())) {
+            throw new BadRequestException("You can only cancel your own appointments.");
+        }
+
+        AppointmentStatus status = appointment.getStatus();
+        if (status != AppointmentStatus.PENDING && status != AppointmentStatus.CONFIRMED) {
+            throw new BadRequestException("Only pending or confirmed appointments can be cancelled.");
+        }
+
+        LocalDateTime slotStartTime = appointment.getTimeSlot() == null
+                ? null
+                : appointment.getTimeSlot().getStartTime();
+        if (slotStartTime != null && !LocalDateTime.now().isBefore(slotStartTime)) {
+            throw new BadRequestException("Past or ongoing appointments cannot be cancelled.");
+        }
+
+        appointment.setStatus(AppointmentStatus.CANCELLED);
+
+        if (appointment.getTimeSlot() != null) {
+            appointment.getTimeSlot().setStatus(TimeSlotStatus.AVAILABLE);
+            timeSlotRepository.save(appointment.getTimeSlot());
+        }
+
         return appointmentRepository.save(appointment);
     }
 
