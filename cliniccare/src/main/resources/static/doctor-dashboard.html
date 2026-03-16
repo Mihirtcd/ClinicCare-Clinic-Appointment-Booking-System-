@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ClinicCare - Doctor Dashboard</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
   <link href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css" rel="stylesheet">
   <link href="assets/css/app.css" rel="stylesheet">
 </head>
@@ -13,8 +15,9 @@
   <div class="container">
     <a class="navbar-brand" href="doctor-dashboard.html">ClinicCare</a>
     <div class="navbar-nav ms-auto">
-      <a class="nav-link active" href="doctor-dashboard.html">Dashboard</a>
-      <button class="btn btn-sm btn-light ms-2" id="logoutBtn">Logout</button>
+      <a class="nav-link" href="index.html"><i class="bi bi-house-door me-1"></i>Home</a>
+      <a class="nav-link active" href="doctor-dashboard.html"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a>
+      <button class="btn btn-sm btn-light ms-2" id="logoutBtn"><i class="bi bi-box-arrow-right me-1"></i>Logout</button>
     </div>
   </div>
 </nav>
@@ -70,7 +73,7 @@
           <option value="COMPLETED">COMPLETED</option>
           <option value="CANCELLED">CANCELLED</option>
         </select>
-        <button class="btn btn-sm btn-outline-success" id="refreshBtn">Refresh</button>
+        <button class="btn btn-sm btn-outline-success" id="refreshBtn"><i class="bi bi-arrow-repeat me-1"></i>Refresh</button>
       </div>
     </div>
     <div class="card-body">
@@ -108,7 +111,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="submit" class="btn btn-danger">Reject</button>
+        <button type="submit" class="btn btn-danger"><i class="bi bi-x-circle me-1"></i>Reject</button>
       </div>
     </form>
   </div>
@@ -159,19 +162,19 @@
         if (item.status === "PENDING") {
           actions =
             '<div class="table-actions">' +
-            '<button class="btn btn-sm btn-primary confirm-btn" data-id="' + item.id + '">Confirm</button>' +
-            '<button class="btn btn-sm btn-danger reject-btn" data-id="' + item.id + '">Reject</button>' +
+            '<button class="btn btn-sm btn-primary confirm-btn" data-id="' + item.id + '"><i class="bi bi-check2 me-1"></i>Confirm</button>' +
+            '<button class="btn btn-sm btn-danger reject-btn" data-id="' + item.id + '"><i class="bi bi-x-circle me-1"></i>Reject</button>' +
             "</div>";
         } else if (item.status === "CONFIRMED") {
           if (isCompletable(item)) {
             actions =
               '<div class="table-actions">' +
-              '<button class="btn btn-sm btn-success complete-btn" data-id="' + item.id + '">Complete</button>' +
+              '<button class="btn btn-sm btn-success complete-btn" data-id="' + item.id + '"><i class="bi bi-check2-circle me-1"></i>Complete</button>' +
               "</div>";
           } else {
             actions =
               '<div class="table-actions">' +
-              '<button class="btn btn-sm btn-secondary" disabled title="Can be completed only after slot end time">Complete</button>' +
+              '<button class="btn btn-sm btn-secondary" disabled title="Can be completed only after slot end time"><i class="bi bi-check2-circle me-1"></i>Complete</button>' +
               "</div>";
           }
         }
@@ -212,6 +215,8 @@
 
     scheduleTable = $("#scheduleTable").DataTable({
       order: [[3, "asc"]],
+      scrollY: "50vh",
+      scrollCollapse: true,
       columnDefs: [
         { targets: 4, orderable: false },
         { targets: 6, orderable: false }
