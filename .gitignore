@@ -1,0 +1,6 @@
+.idea/
+cliniccare/target/
+.env
+.env.*
+cliniccare/postman/
+postman/
