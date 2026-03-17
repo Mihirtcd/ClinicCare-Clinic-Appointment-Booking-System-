@@ -72,7 +72,7 @@ public abstract class AbstractApiIntegrationTest {
         return userRepository.save(user);
     }
 
-    protected String loginAndGetToken(String email, String password) throws Exception {
+    protected String loginAndGetToken(String email, String password) {
         String loginPayload = """
                 {
                   "email":"%s",
