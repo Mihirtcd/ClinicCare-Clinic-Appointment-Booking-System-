@@ -65,7 +65,7 @@ class SecurityAccessIntegrationTest extends AbstractApiIntegrationTest {
     }
 
     @Test
-    void patientToken_shouldNotAccessAdminOrDoctorProtectedEndpoints() throws Exception {
+    void patientToken_shouldNotAccessAdminOrDoctorProtectedEndpoints() {
         String patientToken = loginAndGetToken(patientEmail, patientPassword);
 
         ResponseEntity<String> adminResponse = restTemplate.exchange(
