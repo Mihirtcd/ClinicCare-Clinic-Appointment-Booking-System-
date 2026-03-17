@@ -23,7 +23,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
         <sonar.coverage.exclusions>src/main/resources/static/**</sonar.coverage.exclusions>
-        <sonar.cpd.exclusions>src/main/resources/static/**</sonar.cpd.exclusions>
+        <sonar.cpd.exclusions>
+            src/main/resources/static/**,
+            src/main/java/com/tus/cliniccare/dto/**,
+            src/main/java/com/tus/cliniccare/entity/**
+        </sonar.cpd.exclusions>
     </properties>
 
     <dependencies>
