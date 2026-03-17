@@ -6,6 +6,7 @@ import com.tus.cliniccare.entity.ServiceEntity;
 public final class ServiceMapper {
 
     private ServiceMapper() {
+        throw new UnsupportedOperationException("Utility class");
     }
 
     public static ServiceResponse toResponse(ServiceEntity service) {

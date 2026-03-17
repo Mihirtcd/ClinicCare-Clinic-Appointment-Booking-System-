@@ -6,6 +6,7 @@ import com.tus.cliniccare.entity.Appointment;
 public final class AppointmentMapper {
 
     private AppointmentMapper() {
+        throw new UnsupportedOperationException("Utility class");
     }
 
     public static AppointmentResponse toResponse(Appointment appointment) {

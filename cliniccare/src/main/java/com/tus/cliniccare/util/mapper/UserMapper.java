@@ -6,6 +6,7 @@ import com.tus.cliniccare.entity.User;
 public final class UserMapper {
 
     private UserMapper() {
+        throw new UnsupportedOperationException("Utility class");
     }
 
     public static UserResponse toResponse(User user) {

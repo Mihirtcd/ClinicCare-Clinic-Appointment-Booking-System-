@@ -8,6 +8,7 @@ import java.util.List;
 public final class DoctorMapper {
 
     private DoctorMapper() {
+        throw new UnsupportedOperationException("Utility class");
     }
 
     public static DoctorResponse toResponse(Doctor doctor, List<Long> serviceIds) {

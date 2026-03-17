@@ -6,6 +6,7 @@ import com.tus.cliniccare.entity.TimeSlot;
 public final class TimeSlotMapper {
 
     private TimeSlotMapper() {
+        throw new UnsupportedOperationException("Utility class");
     }
 
     public static TimeSlotResponse toResponse(TimeSlot slot) {
