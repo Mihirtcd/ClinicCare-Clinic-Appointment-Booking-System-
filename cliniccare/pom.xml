@@ -22,6 +22,8 @@
         <jackson-bom.version>2.21.1</jackson-bom.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+        <sonar.coverage.exclusions>src/main/resources/static/**</sonar.coverage.exclusions>
+        <sonar.cpd.exclusions>src/main/resources/static/**</sonar.cpd.exclusions>
     </properties>
 
     <dependencies>
