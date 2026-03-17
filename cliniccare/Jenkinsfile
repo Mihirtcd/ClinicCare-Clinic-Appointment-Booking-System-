@@ -1,0 +1,58 @@
+pipeline {
+    agent any
+
+    tools {
+        jdk 'jdk17'
+        maven 'maven3'
+    }
+
+    options {
+        timestamps()
+    }
+
+    environment {
+        SONAR_PROJECT_KEY = 'cliniccare'
+        SONAR_PROJECT_NAME = 'cliniccare'
+    }
+
+    stages {
+        stage('SCM') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build & Test') {
+            steps {
+                sh 'mvn -f cliniccare/pom.xml -B clean verify'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('LocalSonar') {
+                    sh '''
+                        mvn -f cliniccare/pom.xml -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+                          -DskipTests \
+                          -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+                          -Dsonar.projectName=${SONAR_PROJECT_NAME}
+                    '''
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 10, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            junit allowEmptyResults: true, testResults: 'cliniccare/**/target/surefire-reports/*.xml,cliniccare/**/target/failsafe-reports/*.xml'
+        }
+    }
+}
