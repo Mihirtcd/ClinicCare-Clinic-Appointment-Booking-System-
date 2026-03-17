@@ -18,6 +18,7 @@ public class BookAppointmentRequest {
     private String patientNote;
 
     public BookAppointmentRequest() {
+        // Required by Jackson for JSON deserialization.
     }
 
     public Long getDoctorId() {
