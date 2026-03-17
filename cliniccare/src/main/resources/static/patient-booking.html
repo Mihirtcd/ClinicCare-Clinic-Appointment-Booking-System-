@@ -97,6 +97,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
 <script src="assets/js/app.js"></script>
+<script src="assets/js/ui-common.js"></script>
 <script>
   let slotsTable;
   let bookModal;
@@ -125,19 +126,6 @@
 
   function isPastSlot(slotStart) {
     return slotStart.getTime() < nowTick.getTime();
-  }
-
-  function doctorLabel(doctor) {
-    if (!doctor) {
-      return "Doctor";
-    }
-    const first = doctor.firstName || "";
-    const last = doctor.lastName || "";
-    const fullName = ("Dr. " + first + " " + last).replace(/\s+/g, " ").trim();
-    if (doctor.specialization) {
-      return fullName + " (" + doctor.specialization + ")";
-    }
-    return fullName;
   }
 
   function loadServices() {
@@ -175,7 +163,7 @@
 
     select.append('<option value="">Select doctor</option>');
     doctorsForService.forEach(function (doctor) {
-      select.append('<option value="' + doctor.id + '">' + doctorLabel(doctor) + "</option>");
+      select.append('<option value="' + doctor.id + '">' + ClinicCareUi.doctorLabel(doctor) + "</option>");
     });
     select.prop("disabled", false);
   }
@@ -255,7 +243,7 @@
           (pastSlot ? "disabled" : "") + ">" +
           (pastSlot ? '<i class="bi bi-clock-history me-1"></i>Past' : '<i class="bi bi-calendar-plus me-1"></i>Book') + "</button>";
         slotsTable.row.add([
-          doctorLabel(doctor),
+          ClinicCareUi.doctorLabel(doctor),
           ClinicCare.formatDateTime(slotStart || slot.startTime),
           ClinicCare.formatDateTime(slotEnd || slot.endTime),
           ClinicCare.statusBadge(slot.status),
@@ -310,10 +298,9 @@
       return;
     }
 
-    slotsTable = $("#slotsTable").DataTable({
+    slotsTable = ClinicCareUi.initDataTable("#slotsTable", {
       order: [[1, "asc"]],
       scrollY: "50vh",
-      scrollCollapse: true,
       columnDefs: [{ targets: [3, 4], orderable: false }]
     });
     bookModal = new bootstrap.Modal(document.getElementById("bookModal"));

@@ -82,21 +82,11 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
 <script src="assets/js/app.js"></script>
+<script src="assets/js/ui-common.js"></script>
 <script>
   let appointmentTable;
   const doctorMap = {};
   const serviceMap = {};
-
-  function doctorLabel(doctor) {
-    if (!doctor) {
-      return "Doctor";
-    }
-    const fullName = ("Dr. " + (doctor.firstName || "") + " " + (doctor.lastName || "")).replace(/\s+/g, " ").trim();
-    if (doctor.specialization) {
-      return fullName + " (" + doctor.specialization + ")";
-    }
-    return fullName;
-  }
 
   function loadDashboard() {
     $.when(
@@ -130,7 +120,7 @@
       rows.forEach(function (item, index) {
         const doctor = doctorMap[item.doctorId];
         const service = serviceMap[item.serviceId];
-        const doctorText = doctor ? doctorLabel(doctor) : "Doctor";
+        const doctorText = doctor ? ClinicCareUi.doctorLabel(doctor) : "Doctor";
         const serviceText = service ? (service.name || "Service") : "Service";
         const slotText = (item.slotStartTime && item.slotEndTime)
           ? (ClinicCare.formatDateTime(item.slotStartTime) + " - " + ClinicCare.formatDateTime(item.slotEndTime))
@@ -156,10 +146,8 @@
       return;
     }
 
-    appointmentTable = $("#appointmentsTable").DataTable({
+    appointmentTable = ClinicCareUi.initDataTable("#appointmentsTable", {
       order: [[5, "desc"]],
-      scrollY: "48vh",
-      scrollCollapse: true,
       columnDefs: [
         { targets: 4, orderable: false }
       ]

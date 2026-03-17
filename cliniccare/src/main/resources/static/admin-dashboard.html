@@ -12,18 +12,7 @@
 </head>
 <body>
 <div class="admin-shell">
-  <aside class="admin-sidebar">
-    <div class="admin-brand">ClinicCare Admin</div>
-    <nav class="admin-nav">
-      <a class="admin-nav-link" href="index.html"><i class="bi bi-house-door me-2"></i>Home</a>
-      <a class="admin-nav-link active" href="admin-dashboard.html"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
-      <a class="admin-nav-link" href="admin-users.html"><i class="bi bi-people me-2"></i>Users</a>
-      <a class="admin-nav-link" href="admin-doctors.html"><i class="bi bi-person-badge me-2"></i>Doctors</a>
-      <a class="admin-nav-link" href="admin-services.html"><i class="bi bi-clipboard2-pulse me-2"></i>Services</a>
-      <a class="admin-nav-link" href="admin-timeslots.html"><i class="bi bi-clock-history me-2"></i>Time Slots</a>
-    </nav>
-    <button class="btn btn-sm btn-light mt-auto" id="logoutBtn"><i class="bi bi-box-arrow-right me-1"></i>Logout</button>
-  </aside>
+  <aside class="admin-sidebar" id="adminSidebar"></aside>
 
   <main class="admin-content">
     <div class="admin-page-head">
@@ -110,6 +99,8 @@
 <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script src="assets/js/app.js"></script>
+<script src="assets/js/ui-common.js"></script>
+<script src="assets/js/admin-shell.js"></script>
 <script>
   let usersTable;
   let userRoleChart;
@@ -212,14 +203,15 @@
   }
 
   $(function () {
+    ClinicCareUi.renderAdminSidebar("dashboard");
+
     if (!ClinicCare.requireAuth(["ADMIN"])) {
       return;
     }
 
-    usersTable = $("#usersTable").DataTable({
+    usersTable = ClinicCareUi.initDataTable("#usersTable", {
       order: [[1, "asc"]],
       scrollY: "30vh",
-      scrollCollapse: true,
       columnDefs: [
         { targets: 3, orderable: false }
       ]
