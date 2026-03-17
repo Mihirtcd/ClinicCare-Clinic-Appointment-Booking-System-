@@ -4,6 +4,7 @@ import com.tus.cliniccare.dto.request.CreateServiceRequest;
 import com.tus.cliniccare.dto.response.ServiceResponse;
 import com.tus.cliniccare.entity.ServiceEntity;
 import com.tus.cliniccare.service.ServiceEntityService;
+import com.tus.cliniccare.util.mapper.ServiceMapper;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,14 +39,14 @@ public class AdminServiceController {
                 request.getDurationMinutes(),
                 request.getIsEnabled()
         );
-        return ResponseEntity.status(HttpStatus.CREATED).body(toServiceResponse(service));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ServiceMapper.toResponse(service));
     }
 
     @GetMapping
     public ResponseEntity<List<ServiceResponse>> getAllServices() {
         List<ServiceResponse> responses = serviceEntityService.getAllServices()
                 .stream()
-                .map(this::toServiceResponse)
+                .map(ServiceMapper::toResponse)
                 .toList();
         return ResponseEntity.ok(responses);
     }
@@ -62,22 +63,12 @@ public class AdminServiceController {
                 request.getDurationMinutes(),
                 request.getIsEnabled()
         );
-        return ResponseEntity.ok(toServiceResponse(updated));
+        return ResponseEntity.ok(ServiceMapper.toResponse(updated));
     }
 
     @PatchMapping("/{id}/disable")
     public ResponseEntity<ServiceResponse> disableService(@PathVariable Long id) {
         ServiceEntity disabled = serviceEntityService.disableService(id);
-        return ResponseEntity.ok(toServiceResponse(disabled));
-    }
-
-    private ServiceResponse toServiceResponse(ServiceEntity service) {
-        ServiceResponse response = new ServiceResponse();
-        response.setId(service.getId());
-        response.setName(service.getName());
-        response.setDescription(service.getDescription());
-        response.setDurationMinutes(service.getDurationMinutes());
-        response.setIsEnabled(service.getIsEnabled());
-        return response;
+        return ResponseEntity.ok(ServiceMapper.toResponse(disabled));
     }
 }

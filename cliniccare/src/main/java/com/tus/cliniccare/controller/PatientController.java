@@ -7,12 +7,14 @@ import com.tus.cliniccare.dto.response.ServiceResponse;
 import com.tus.cliniccare.dto.response.TimeSlotResponse;
 import com.tus.cliniccare.entity.Appointment;
 import com.tus.cliniccare.entity.Doctor;
-import com.tus.cliniccare.entity.ServiceEntity;
-import com.tus.cliniccare.entity.TimeSlot;
 import com.tus.cliniccare.service.AppointmentService;
 import com.tus.cliniccare.service.DoctorService;
 import com.tus.cliniccare.service.ServiceEntityService;
 import com.tus.cliniccare.service.TimeSlotService;
+import com.tus.cliniccare.util.mapper.AppointmentMapper;
+import com.tus.cliniccare.util.mapper.DoctorMapper;
+import com.tus.cliniccare.util.mapper.ServiceMapper;
+import com.tus.cliniccare.util.mapper.TimeSlotMapper;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,7 +57,7 @@ public class PatientController {
     public ResponseEntity<List<ServiceResponse>> getEnabledServices() {
         List<ServiceResponse> responses = serviceEntityService.getEnabledServices()
                 .stream()
-                .map(this::toServiceResponse)
+                .map(ServiceMapper::toResponse)
                 .toList();
         return ResponseEntity.ok(responses);
     }
@@ -73,7 +75,7 @@ public class PatientController {
     public ResponseEntity<List<TimeSlotResponse>> getAvailableSlotsByDoctor(@RequestParam Long doctorId) {
         List<TimeSlotResponse> responses = timeSlotService.getAvailableSlotsByDoctor(doctorId)
                 .stream()
-                .map(this::toTimeSlotResponse)
+                .map(TimeSlotMapper::toResponse)
                 .toList();
         return ResponseEntity.ok(responses);
     }
@@ -82,7 +84,7 @@ public class PatientController {
     public ResponseEntity<List<AppointmentResponse>> getAppointmentsByPatient(Authentication authentication) {
         List<AppointmentResponse> responses = appointmentService.getAppointmentsByPatient(authentication.getName())
                 .stream()
-                .map(this::toAppointmentResponse)
+                .map(AppointmentMapper::toResponse)
                 .toList();
         return ResponseEntity.ok(responses);
     }
@@ -99,7 +101,7 @@ public class PatientController {
                 request.getTimeSlotId(),
                 request.getPatientNote()
         );
-        return ResponseEntity.status(HttpStatus.CREATED).body(toAppointmentResponse(appointment));
+        return ResponseEntity.status(HttpStatus.CREATED).body(AppointmentMapper.toResponse(appointment));
     }
 
     @PatchMapping("/appointments/{id}/cancel")
@@ -108,67 +110,13 @@ public class PatientController {
             Authentication authentication
     ) {
         Appointment appointment = appointmentService.cancelAppointmentByPatient(id, authentication.getName());
-        return ResponseEntity.ok(toAppointmentResponse(appointment));
-    }
-
-    private ServiceResponse toServiceResponse(ServiceEntity service) {
-        ServiceResponse response = new ServiceResponse();
-        response.setId(service.getId());
-        response.setName(service.getName());
-        response.setDescription(service.getDescription());
-        response.setDurationMinutes(service.getDurationMinutes());
-        response.setIsEnabled(service.getIsEnabled());
-        return response;
+        return ResponseEntity.ok(AppointmentMapper.toResponse(appointment));
     }
 
     private DoctorResponse toDoctorResponse(Doctor doctor) {
-        DoctorResponse response = new DoctorResponse();
-        response.setId(doctor.getId());
-        response.setUserId(doctor.getUser().getId());
-        response.setFirstName(doctor.getUser().getFirstName());
-        response.setLastName(doctor.getUser().getLastName());
-        response.setSpecialization(doctor.getSpecialization());
-        response.setServiceIds(
-                doctorService.getDoctorServices(doctor.getId()).stream()
-                        .map(doctorServiceEntity -> doctorServiceEntity.getService().getId())
-                        .toList()
-        );
-        return response;
-    }
-
-    private TimeSlotResponse toTimeSlotResponse(TimeSlot slot) {
-        TimeSlotResponse response = new TimeSlotResponse();
-        response.setId(slot.getId());
-        response.setDoctorId(slot.getDoctor().getId());
-        response.setStartTime(slot.getStartTime());
-        response.setEndTime(slot.getEndTime());
-        response.setStatus(slot.getStatus());
-        return response;
-    }
-
-    private AppointmentResponse toAppointmentResponse(Appointment appointment) {
-        AppointmentResponse response = new AppointmentResponse();
-        response.setId(appointment.getId());
-        response.setPatientId(appointment.getPatient().getId());
-        response.setPatientName(
-                ((appointment.getPatient().getFirstName() == null ? "" : appointment.getPatient().getFirstName()) + " "
-                        + (appointment.getPatient().getLastName() == null ? "" : appointment.getPatient().getLastName()))
-                        .trim()
-        );
-        response.setDoctorId(appointment.getDoctor().getId());
-        response.setDoctorName(
-                ((appointment.getDoctor().getUser().getFirstName() == null ? "" : appointment.getDoctor().getUser().getFirstName()) + " "
-                        + (appointment.getDoctor().getUser().getLastName() == null ? "" : appointment.getDoctor().getUser().getLastName()))
-                        .trim()
-        );
-        response.setServiceId(appointment.getService().getId());
-        response.setServiceName(appointment.getService().getName());
-        response.setTimeSlotId(appointment.getTimeSlot().getId());
-        response.setSlotStartTime(appointment.getTimeSlot().getStartTime());
-        response.setSlotEndTime(appointment.getTimeSlot().getEndTime());
-        response.setStatus(appointment.getStatus());
-        response.setPatientNote(appointment.getPatientNote());
-        response.setBookedAt(appointment.getBookedAt());
-        return response;
+        List<Long> serviceIds = doctorService.getDoctorServices(doctor.getId()).stream()
+                .map(doctorServiceEntity -> doctorServiceEntity.getService().getId())
+                .toList();
+        return DoctorMapper.toResponse(doctor, serviceIds);
     }
 }

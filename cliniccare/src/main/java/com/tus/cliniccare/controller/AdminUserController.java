@@ -5,6 +5,7 @@ import com.tus.cliniccare.dto.response.UserResponse;
 import com.tus.cliniccare.entity.User;
 import com.tus.cliniccare.entity.enums.Role;
 import com.tus.cliniccare.service.UserService;
+import com.tus.cliniccare.util.mapper.UserMapper;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,7 @@ public class AdminUserController {
     public ResponseEntity<List<UserResponse>> getUsers(@RequestParam(required = false) Role role) {
         List<User> users = role == null ? userService.getAllUsers() : userService.getUsersByRole(role);
         List<UserResponse> responses = users.stream()
-                .map(this::toUserResponse)
+                .map(UserMapper::toResponse)
                 .toList();
         return ResponseEntity.ok(responses);
     }
@@ -48,17 +49,6 @@ public class AdminUserController {
                 request.getPhoneNumber(),
                 request.getRole()
         );
-        return ResponseEntity.status(HttpStatus.CREATED).body(toUserResponse(user));
-    }
-
-    private UserResponse toUserResponse(User user) {
-        UserResponse response = new UserResponse();
-        response.setId(user.getId());
-        response.setFirstName(user.getFirstName());
-        response.setLastName(user.getLastName());
-        response.setEmail(user.getEmail());
-        response.setPhoneNumber(user.getPhoneNumber());
-        response.setRole(user.getRole());
-        return response;
+        return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.toResponse(user));
     }
 }

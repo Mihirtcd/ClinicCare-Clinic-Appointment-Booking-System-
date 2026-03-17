@@ -4,6 +4,7 @@ import com.tus.cliniccare.dto.request.CreateTimeSlotRequest;
 import com.tus.cliniccare.dto.response.TimeSlotResponse;
 import com.tus.cliniccare.entity.TimeSlot;
 import com.tus.cliniccare.service.TimeSlotService;
+import com.tus.cliniccare.util.mapper.TimeSlotMapper;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,25 +36,15 @@ public class AdminTimeSlotController {
                 request.getStartTime(),
                 request.getEndTime()
         );
-        return ResponseEntity.status(HttpStatus.CREATED).body(toTimeSlotResponse(slot));
+        return ResponseEntity.status(HttpStatus.CREATED).body(TimeSlotMapper.toResponse(slot));
     }
 
     @GetMapping("/doctor/{doctorId}")
     public ResponseEntity<List<TimeSlotResponse>> getSlotsByDoctor(@PathVariable Long doctorId) {
         List<TimeSlotResponse> responses = timeSlotService.getSlotsByDoctor(doctorId)
                 .stream()
-                .map(this::toTimeSlotResponse)
+                .map(TimeSlotMapper::toResponse)
                 .toList();
         return ResponseEntity.ok(responses);
-    }
-
-    private TimeSlotResponse toTimeSlotResponse(TimeSlot slot) {
-        TimeSlotResponse response = new TimeSlotResponse();
-        response.setId(slot.getId());
-        response.setDoctorId(slot.getDoctor().getId());
-        response.setStartTime(slot.getStartTime());
-        response.setEndTime(slot.getEndTime());
-        response.setStatus(slot.getStatus());
-        return response;
     }
 }

@@ -1,37 +1,23 @@
 package com.tus.cliniccare.integration;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tus.cliniccare.entity.Doctor;
 import com.tus.cliniccare.entity.DoctorService;
 import com.tus.cliniccare.entity.ServiceEntity;
 import com.tus.cliniccare.entity.TimeSlot;
-import com.tus.cliniccare.entity.User;
 import com.tus.cliniccare.entity.enums.Role;
 import com.tus.cliniccare.entity.enums.TimeSlotStatus;
-import com.tus.cliniccare.repository.AppointmentRepository;
-import com.tus.cliniccare.repository.DoctorRepository;
-import com.tus.cliniccare.repository.DoctorServiceRepository;
-import com.tus.cliniccare.repository.ServiceRepository;
-import com.tus.cliniccare.repository.TimeSlotRepository;
-import com.tus.cliniccare.repository.UserRepository;
+import com.tus.cliniccare.support.AbstractApiIntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(
@@ -46,34 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
                 "app.jwt.secret=Y2xpbmljY2FyZS1hY2FkZW1pYy1qd3Qtc2VjcmV0LWtleS1mb3ItcHJvamVjdC1kZW1vLXNpZ25pbmctMzJieXRlcw=="
         }
 )
-class DoctorOwnershipIntegrationTest {
-
-    @Autowired
-    private TestRestTemplate restTemplate;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private AppointmentRepository appointmentRepository;
-
-    @Autowired
-    private TimeSlotRepository timeSlotRepository;
-
-    @Autowired
-    private DoctorServiceRepository doctorServiceRepository;
-
-    @Autowired
-    private DoctorRepository doctorRepository;
-
-    @Autowired
-    private ServiceRepository serviceRepository;
-
-    @Autowired
-    private UserRepository userRepository;
+class DoctorOwnershipIntegrationTest extends AbstractApiIntegrationTest {
 
     private final String patientEmail = "patient.ownership@cliniccare.com";
     private final String patientPassword = "Password@123";
@@ -87,20 +46,11 @@ class DoctorOwnershipIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        appointmentRepository.deleteAll();
-        timeSlotRepository.deleteAll();
-        doctorServiceRepository.deleteAll();
-        doctorRepository.deleteAll();
-        serviceRepository.deleteAll();
-        userRepository.deleteAll();
+        resetDatabase();
 
-        User patient = user(patientEmail, patientPassword, Role.PATIENT);
-        userRepository.save(patient);
-
-        User doctorOneUser = user(doctorOneEmail, doctorPassword, Role.DOCTOR);
-        User doctorTwoUser = user(doctorTwoEmail, doctorPassword, Role.DOCTOR);
-        doctorOneUser = userRepository.save(doctorOneUser);
-        doctorTwoUser = userRepository.save(doctorTwoUser);
+        createUser(patientEmail, patientPassword, Role.PATIENT);
+        com.tus.cliniccare.entity.User doctorOneUser = createUser(doctorOneEmail, doctorPassword, Role.DOCTOR);
+        com.tus.cliniccare.entity.User doctorTwoUser = createUser(doctorTwoEmail, doctorPassword, Role.DOCTOR);
 
         Doctor doctorOne = new Doctor();
         doctorOne.setUser(doctorOneUser);
@@ -177,51 +127,5 @@ class DoctorOwnershipIntegrationTest {
         assertEquals(HttpStatus.OK, doctorOneConfirmResponse.getStatusCode());
         JsonNode confirmedBody = objectMapper.readTree(doctorOneConfirmResponse.getBody());
         assertEquals("CONFIRMED", confirmedBody.get("status").asText());
-    }
-
-    private User user(String email, String rawPassword, Role role) {
-        User user = new User();
-        user.setFirstName("Test");
-        user.setLastName("User");
-        user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(rawPassword));
-        user.setPhoneNumber("9111111111");
-        user.setRole(role);
-        return user;
-    }
-
-    private String loginAndGetToken(String email, String password) throws Exception {
-        String loginPayload = """
-                {
-                  "email":"%s",
-                  "password":"%s"
-                }
-                """.formatted(email, password);
-
-        ResponseEntity<String> loginResponse = restTemplate.exchange(
-                "/api/auth/login",
-                HttpMethod.POST,
-                jsonEntity(loginPayload),
-                String.class
-        );
-
-        assertEquals(HttpStatus.OK, loginResponse.getStatusCode());
-        String authHeader = loginResponse.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-        assertNotNull(authHeader);
-        assertTrue(authHeader.startsWith("Bearer "));
-        return authHeader.substring("Bearer ".length());
-    }
-
-    private HttpEntity<String> jsonEntity(String body) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        return new HttpEntity<>(body, headers);
-    }
-
-    private HttpEntity<String> authorizedJsonEntity(String token, String body) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(token);
-        return new HttpEntity<>(body, headers);
     }
 }

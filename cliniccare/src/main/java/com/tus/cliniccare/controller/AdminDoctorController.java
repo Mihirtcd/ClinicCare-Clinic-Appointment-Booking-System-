@@ -4,6 +4,7 @@ import com.tus.cliniccare.dto.request.CreateDoctorRequest;
 import com.tus.cliniccare.dto.response.DoctorResponse;
 import com.tus.cliniccare.entity.Doctor;
 import com.tus.cliniccare.service.DoctorService;
+import com.tus.cliniccare.util.mapper.DoctorMapper;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,17 +48,9 @@ public class AdminDoctorController {
     }
 
     private DoctorResponse toDoctorResponse(Doctor doctor) {
-        DoctorResponse response = new DoctorResponse();
-        response.setId(doctor.getId());
-        response.setUserId(doctor.getUser().getId());
-        response.setFirstName(doctor.getUser().getFirstName());
-        response.setLastName(doctor.getUser().getLastName());
-        response.setSpecialization(doctor.getSpecialization());
-        response.setServiceIds(
-                doctorService.getDoctorServices(doctor.getId()).stream()
-                        .map(doctorServiceEntity -> doctorServiceEntity.getService().getId())
-                        .toList()
-        );
-        return response;
+        List<Long> serviceIds = doctorService.getDoctorServices(doctor.getId()).stream()
+                .map(doctorServiceEntity -> doctorServiceEntity.getService().getId())
+                .toList();
+        return DoctorMapper.toResponse(doctor, serviceIds);
     }
 }

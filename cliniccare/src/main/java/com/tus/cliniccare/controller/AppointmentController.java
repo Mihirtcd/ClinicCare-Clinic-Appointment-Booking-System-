@@ -5,6 +5,7 @@ import com.tus.cliniccare.dto.response.AppointmentResponse;
 import com.tus.cliniccare.entity.Appointment;
 import com.tus.cliniccare.exception.BadRequestException;
 import com.tus.cliniccare.service.AppointmentService;
+import com.tus.cliniccare.util.mapper.AppointmentMapper;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,7 +37,7 @@ public class AppointmentController {
                 authentication.getName(),
                 isAdmin(authentication)
         );
-        return ResponseEntity.ok(toAppointmentResponse(appointment));
+        return ResponseEntity.ok(AppointmentMapper.toResponse(appointment));
     }
 
     @PatchMapping("/{id}/reject")
@@ -55,7 +56,7 @@ public class AppointmentController {
                 authentication.getName(),
                 isAdmin(authentication)
         );
-        return ResponseEntity.ok(toAppointmentResponse(appointment));
+        return ResponseEntity.ok(AppointmentMapper.toResponse(appointment));
     }
 
     @PatchMapping("/{id}/complete")
@@ -69,37 +70,11 @@ public class AppointmentController {
                 authentication.getName(),
                 isAdmin(authentication)
         );
-        return ResponseEntity.ok(toAppointmentResponse(appointment));
+        return ResponseEntity.ok(AppointmentMapper.toResponse(appointment));
     }
 
     private boolean isAdmin(Authentication authentication) {
         return authentication.getAuthorities().stream()
                 .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
-    }
-
-    private AppointmentResponse toAppointmentResponse(Appointment appointment) {
-        AppointmentResponse response = new AppointmentResponse();
-        response.setId(appointment.getId());
-        response.setPatientId(appointment.getPatient().getId());
-        response.setPatientName(
-                ((appointment.getPatient().getFirstName() == null ? "" : appointment.getPatient().getFirstName()) + " "
-                        + (appointment.getPatient().getLastName() == null ? "" : appointment.getPatient().getLastName()))
-                        .trim()
-        );
-        response.setDoctorId(appointment.getDoctor().getId());
-        response.setDoctorName(
-                ((appointment.getDoctor().getUser().getFirstName() == null ? "" : appointment.getDoctor().getUser().getFirstName()) + " "
-                        + (appointment.getDoctor().getUser().getLastName() == null ? "" : appointment.getDoctor().getUser().getLastName()))
-                        .trim()
-        );
-        response.setServiceId(appointment.getService().getId());
-        response.setServiceName(appointment.getService().getName());
-        response.setTimeSlotId(appointment.getTimeSlot().getId());
-        response.setSlotStartTime(appointment.getTimeSlot().getStartTime());
-        response.setSlotEndTime(appointment.getTimeSlot().getEndTime());
-        response.setStatus(appointment.getStatus());
-        response.setPatientNote(appointment.getPatientNote());
-        response.setBookedAt(appointment.getBookedAt());
-        return response;
     }
 }

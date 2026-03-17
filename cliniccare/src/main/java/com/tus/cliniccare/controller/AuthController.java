@@ -9,6 +9,7 @@ import com.tus.cliniccare.exception.ResourceNotFoundException;
 import com.tus.cliniccare.security.CustomUserDetailsService;
 import com.tus.cliniccare.security.JwtService;
 import com.tus.cliniccare.service.UserService;
+import com.tus.cliniccare.util.mapper.UserMapper;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -52,7 +53,7 @@ public class AuthController {
                 request.getPassword(),
                 request.getPhoneNumber()
         );
-        return ResponseEntity.status(HttpStatus.CREATED).body(toUserResponse(savedUser));
+        return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.toResponse(savedUser));
     }
 
     @PostMapping("/login")
@@ -73,17 +74,6 @@ public class AuthController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-                .body(toUserResponse(user));
-    }
-
-    private UserResponse toUserResponse(User user) {
-        UserResponse response = new UserResponse();
-        response.setId(user.getId());
-        response.setFirstName(user.getFirstName());
-        response.setLastName(user.getLastName());
-        response.setEmail(user.getEmail());
-        response.setPhoneNumber(user.getPhoneNumber());
-        response.setRole(user.getRole());
-        return response;
+                .body(UserMapper.toResponse(user));
     }
 }
