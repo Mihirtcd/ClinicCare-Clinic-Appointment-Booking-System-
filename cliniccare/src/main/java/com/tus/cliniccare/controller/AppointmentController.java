@@ -6,6 +6,8 @@ import com.tus.cliniccare.entity.Appointment;
 import com.tus.cliniccare.exception.BadRequestException;
 import com.tus.cliniccare.service.AppointmentService;
 import com.tus.cliniccare.util.mapper.AppointmentMapper;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/appointments")
+@Tag(name = "Appointments", description = "Doctor/admin appointment decision endpoints.")
+@SecurityRequirement(name = "bearerAuth")
 public class AppointmentController {
 
     private final AppointmentService appointmentService;

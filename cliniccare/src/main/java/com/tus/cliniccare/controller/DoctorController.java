@@ -5,6 +5,8 @@ import com.tus.cliniccare.entity.Appointment;
 import com.tus.cliniccare.entity.enums.AppointmentStatus;
 import com.tus.cliniccare.service.AppointmentService;
 import com.tus.cliniccare.util.mapper.AppointmentMapper;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -18,6 +20,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/doctor")
 @PreAuthorize("hasRole('DOCTOR')")
+@Tag(name = "Doctor", description = "Doctor schedule and appointment viewing endpoints.")
+@SecurityRequirement(name = "bearerAuth")
 public class DoctorController {
 
     private final AppointmentService appointmentService;

@@ -5,6 +5,8 @@ import com.tus.cliniccare.dto.response.TimeSlotResponse;
 import com.tus.cliniccare.entity.TimeSlot;
 import com.tus.cliniccare.service.TimeSlotService;
 import com.tus.cliniccare.util.mapper.TimeSlotMapper;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/timeslots")
 @PreAuthorize("hasRole('ADMIN')")
+@Tag(name = "Admin Time Slots", description = "Admin endpoints for doctor slot creation and listing.")
+@SecurityRequirement(name = "bearerAuth")
 public class AdminTimeSlotController {
 
     private final TimeSlotService timeSlotService;

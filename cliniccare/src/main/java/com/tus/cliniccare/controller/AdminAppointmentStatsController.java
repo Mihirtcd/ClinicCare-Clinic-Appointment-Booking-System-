@@ -3,6 +3,8 @@ package com.tus.cliniccare.controller;
 import com.tus.cliniccare.dto.response.AppointmentStatsResponse;
 import com.tus.cliniccare.entity.enums.AppointmentStatus;
 import com.tus.cliniccare.service.AppointmentService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/admin/appointments")
 @PreAuthorize("hasRole('ADMIN')")
+@Tag(name = "Admin Appointments", description = "Admin endpoints for appointment statistics.")
+@SecurityRequirement(name = "bearerAuth")
 public class AdminAppointmentStatsController {
 
     private final AppointmentService appointmentService;

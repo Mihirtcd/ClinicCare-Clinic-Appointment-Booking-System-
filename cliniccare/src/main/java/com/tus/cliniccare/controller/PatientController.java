@@ -15,6 +15,8 @@ import com.tus.cliniccare.util.mapper.AppointmentMapper;
 import com.tus.cliniccare.util.mapper.DoctorMapper;
 import com.tus.cliniccare.util.mapper.ServiceMapper;
 import com.tus.cliniccare.util.mapper.TimeSlotMapper;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +36,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/patient")
 @PreAuthorize("hasRole('PATIENT')")
+@Tag(name = "Patient", description = "Patient operations for browsing, booking, and managing appointments.")
+@SecurityRequirement(name = "bearerAuth")
 public class PatientController {
 
     private final ServiceEntityService serviceEntityService;

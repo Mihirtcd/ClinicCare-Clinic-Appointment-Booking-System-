@@ -6,6 +6,8 @@ import com.tus.cliniccare.entity.User;
 import com.tus.cliniccare.entity.enums.Role;
 import com.tus.cliniccare.service.UserService;
 import com.tus.cliniccare.util.mapper.UserMapper;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/users")
 @PreAuthorize("hasRole('ADMIN')")
+@Tag(name = "Admin Users", description = "Admin endpoints for user listing and user creation.")
+@SecurityRequirement(name = "bearerAuth")
 public class AdminUserController {
 
     private final UserService userService;

@@ -10,6 +10,7 @@ import com.tus.cliniccare.security.CustomUserDetailsService;
 import com.tus.cliniccare.security.JwtService;
 import com.tus.cliniccare.service.UserService;
 import com.tus.cliniccare.util.mapper.UserMapper;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Authentication", description = "Public endpoints for user registration and login.")
 public class AuthController {
 
     private final UserService userService;

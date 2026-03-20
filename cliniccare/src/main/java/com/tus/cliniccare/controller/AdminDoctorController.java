@@ -5,6 +5,8 @@ import com.tus.cliniccare.dto.response.DoctorResponse;
 import com.tus.cliniccare.entity.Doctor;
 import com.tus.cliniccare.service.DoctorService;
 import com.tus.cliniccare.util.mapper.DoctorMapper;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/doctors")
 @PreAuthorize("hasRole('ADMIN')")
+@Tag(name = "Admin Doctors", description = "Admin endpoints for doctor profile management.")
+@SecurityRequirement(name = "bearerAuth")
 public class AdminDoctorController {
 
     private final DoctorService doctorService;
